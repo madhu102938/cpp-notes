@@ -86,8 +86,9 @@ public:
         if (target == 0)
         {
             // Sort the current combination and add it to the answer vector
-            sort(ds.begin(), ds.end());
-            ans.push_back(ds);
+            vector<int> temp = ds;
+            sort(temp.begin(), temp.end());
+            ans.push_back(temp);
             return;
         }
 
