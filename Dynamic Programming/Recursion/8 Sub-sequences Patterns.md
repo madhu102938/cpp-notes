@@ -85,10 +85,8 @@ public:
         // Base case: if the target sum is 0, the current combination is valid
         if (target == 0)
         {
-            // Sort the current combination and add it to the answer vector
-            vector<int> temp = ds;
-            sort(temp.begin(), temp.end());
-            ans.push_back(temp);
+            // Add it to the answer vector
+            ans.push_back(ds);
             return;
         }
 
