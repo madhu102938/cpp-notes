@@ -39,7 +39,7 @@ def singleNonDuplicate(self, nums: [int]) -> int:
          +----+----+----+----+----+----+----+----+----+
          
          <-----------+                   +----------->
-		             |                   |
+                     |                   |
                  Duplicate            Duplicate
                   Element             Element
                  (even odd)          (odd even)
