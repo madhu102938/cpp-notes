@@ -13,11 +13,11 @@ int func(int arr[], int n)
 <hr>
 
 **Q) Swapping two elements without using a temp variable**
-`a = 5`
-`b = 7`
-`a = a^b` 
-`b = a^b`  Here `b = (a^b)^b` and `b^b` cancels and we get `b = a`
-`a = a^b`  Here `a = (a^b)^a` and `a^a` cancels and we get `a = b`
+- `a = 5`
+- `b = 7`
+- `a = a^b` 
+- `b = a^b`  Here `b = (a^b)^b` and `b^b` cancels and we get `b = a`
+- `a = a^b`  Here `a = (a^b)^a` and `a^a` cancels and we get `a = b`
 
 <hr>
 
