@@ -30,7 +30,9 @@ int main()
 
 <hr>
 
+
 ## Higher bound
+
 lower bound of `x` means, smallest index in an array which satisfies the condition `arr[ind] > x`
 
 ```python
