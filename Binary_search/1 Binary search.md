@@ -15,7 +15,9 @@ def search(nums : [int], target : int) -> int:
 ```
 
 <hr>
+
 ## Recursive binary search
+
 ```python
 def search(nums : [int], target : int, high, low = 0) -> int:
     if low > high: # Base case
