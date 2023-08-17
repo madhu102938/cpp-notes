@@ -1,4 +1,4 @@
-**Q)** Given a non-negative integer `x`, return _the square root of_ `x` _rounded down to the nearest integer_. The returned integer should be **non-negative** as well.
+**1Q)** Given a non-negative integer `x`, return _the square root of_ `x` _rounded down to the nearest integer_. The returned integer should be **non-negative** as well.
 
 You **must not use** any built-in exponent function or operator.
 
@@ -30,7 +30,7 @@ def mySqrt(x: int) -> int:
 
 <hr>
 
-**Q)** You are given 2 numbers **(n , m)**; the task is to find **n√m** (nth root of m). If answer is not an integer return -1
+**2Q)** You are given 2 numbers **(n , m)**; the task is to find **n√m** (nth root of m). If answer is not an integer return -1
 
 ```python
 class Solution:
@@ -66,7 +66,7 @@ class Solution:
 
 <hr>
 
-**Q)** Koko loves to eat bananas. There are `n` piles of bananas, the `ith` pile has `piles[i]` bananas. The guards have gone and will come back in `h` hours.
+**3Q)** Koko loves to eat bananas. There are `n` piles of bananas, the `ith` pile has `piles[i]` bananas. The guards have gone and will come back in `h` hours.
 
 Koko can decide her bananas-per-hour eating speed of `k`. Each hour, she chooses some pile of bananas and eats `k` bananas from that pile. If the pile has less than `k` bananas, she eats all of them instead and will not eat any more bananas during this hour.
 
@@ -118,9 +118,16 @@ class Solution:
         return ans  # Return the minimum eating speed
 ```
 
+|time | low | high |
+|------|------|------|
+|Start | Impossible value | Possible value|
+|End | Possible value | Impossible value|
+
+We can also return `low` which will be correct answer
+
 <hr>
 
-**Q)** You are given an integer array `bloomDay`, an integer `m` and an integer `k`.
+**4Q)** You are given an integer array `bloomDay`, an integer `m` and an integer `k`.
 
 You want to make `m` bouquets. To make a bouquet, you need to use `k` **adjacent flowers** from the garden.
 
@@ -166,4 +173,174 @@ class Solution:
         else:
             return ans  # Return the minimum number of days required
 
+```
+
+|time | low | high |
+|------|------|------|
+|Start | Impossible value | Possible value|
+|End | Possible value | Impossible value|
+
+We can return low in this question, but in impossible case (where we don't have an answer) low will exceed the maximum element in the array so we need to account for that case
+```python
+if low > maxi:
+	return -1
+return low
+```
+
+<hr>
+
+**5Q)** Given an array of integers `nums` and an integer `threshold`, we will choose a positive integer `divisor`, divide all the array by it, and sum the division's result. Find the **smallest** `divisor` such that the result mentioned above is less than or equal to `threshold`.
+
+Each result of the division is rounded to the nearest integer greater than or equal to that element. (For example: `7/3 = 3` and `10/2 = 5`).
+
+The test cases are generated so that there will be an answer.
+
+```python
+# Importing all functions and variables from the math module
+from math import *
+
+# Helper function to calculate the sum of ceil(i / tryNumber) for each i in nums
+def helper_fun(nums : [int], tryNumber : int):
+    maybe_ans = 0
+    for i in nums:
+        maybe_ans += ceil(i / tryNumber)  # Incrementing maybe_ans with the ceiling division of i by tryNumber
+    return maybe_ans
+
+# Function to find the smallest divisor that makes the sum of ceil(i / divisor) for each i in nums <= threshold
+def smallestDivisor(nums: [int], threshold: int) -> int:
+    high = nums[0]  # Initialize the upper bound of the binary search range as the first element of nums
+    low = 1  # Initialize the lower bound of the binary search range as 1
+    for i in nums:
+        high = max(high, i)  # Update high with the maximum value between high and i (used for binary search range)
+    while low <= high:
+        mid = (high + low) >> 1  # Calculate the middle point of the binary search range
+        temp_ans = helper_fun(nums, mid)  # Calculate the sum using helper_fun with mid as tryNumber
+        if temp_ans <= threshold:
+            ans = mid  # Update ans with mid if temp_ans is within the threshold
+            high = mid - 1  # Update the upper bound of the binary search range
+        else:
+            low = mid + 1  # Update the lower bound of the binary search range
+    return low  # Return the lower bound when the binary search is complete
+
+# End of code
+```
+
+|time | low | high |
+|------|------|------|
+|Start | Impossible value | Possible value|
+|End | Possible value | Impossible value|
+
+Thus we can return low
+
+<hr>
+
+**6Q)** A conveyor belt has packages that must be shipped from one port to another within `days` days.
+
+The `ith` package on the conveyor belt has a weight of `weights[i]`. Each day, we load the ship with packages on the conveyor belt (in the order given by `weights`). We may not load more weight than the maximum weight capacity of the ship.
+
+Return the least weight capacity of the ship that will result in all the packages on the conveyor belt being shipped within `days` days.
+
+```python
+class Solution:
+    # Helper function to determine how many days are needed to ship all items using a given capacity
+    def helper_fun(self, nums: [int], tryNumber: int, n: int):
+        maybe_ans = 0       # Initialize the count of required days
+        cum_weight = 0      # Initialize the cumulative weight for the current day's shipment
+        
+        # Loop through each item in the list
+        for i in range(n):
+            if cum_weight + nums[i] > tryNumber:
+                maybe_ans += 1              # Increment days count, as the cumulative weight exceeds the given capacity
+                cum_weight = nums[i]        # Reset cumulative weight for the next day's shipment
+            else:
+                cum_weight += nums[i]       # Add the item's weight to the cumulative weight
+        
+        return maybe_ans + 1   # Return the total days required for shipment (adding 1 to account for the last day)
+
+    # Function to find the minimum capacity needed to ship items within a given threshold of days
+    def shipWithinDays(self, nums: [int], threshold: int) -> int:
+        high = 0           # Initialize the upper bound of binary search as 0 (maximum capacity)
+        low = nums[0]      # Initialize the lower bound of binary search as the weight of the first item
+        n = 0              # Initialize the count of items
+        
+        # Calculate the maximum and minimum capacity bounds, and count the total number of items
+        for i in nums:
+            low = max(low, i)    # Update the minimum capacity with the maximum weight of an item
+            high += i            # Calculate the total sum of weights (maximum capacity)
+            n += 1               # Increment the item count
+        
+        # Perform binary search to find the minimum capacity that satisfies the threshold
+        while low <= high:
+            mid = (high + low) >> 1   # Calculate the middle point of the capacity range
+            temp_ans = self.helper_fun(nums, mid, n)   # Calculate days needed using the helper function
+            
+            if temp_ans <= threshold:
+                high = mid - 1   # Adjust the upper bound for capacity search
+            else:
+                low = mid + 1    # Adjust the lower bound for capacity search
+        
+        return low   # Return the minimum capacity needed to ship items within the given threshold of days
+
+# End of code
+```
+
+|time | low | high |
+|------|------|------|
+|Start | Impossible value | Possible value|
+|End | Possible value | Impossible value|
+
+We can just return low here.
+
+
+<hr>
+
+**7Q)** Given an array `arr` of positive integers sorted in a **strictly increasing order**, and an integer `k`.
+
+Return _the_ `kth` _**positive** integer that is **missing** from this array._
+
+### Brute force
+```python
+def bruteForceKthMissing(nums: [int], k: int) -> int:
+    for i in nums:
+        if i < k:
+            k += 1    # Increment k because we've found a number in the array that is less than k
+        else:
+            return k  # Return k when we've found a number in the array greater than or equal to k
+
+# End of code
+```
+
+### Optimal solution
+- We take `high` set to end of array and `low` set to start of array
+- At any element number of numbers missing are `arr[i] - (i + 1)` as ideally we should have `i+1` at `i`th index
+- We do this using high and low
+```python
+while low <= high:
+	mid = (high + low) >> 1
+	cur_miss_num = arr[mid] - mid - 1
+	if cur_miss_num < k:
+		low = mid + 1
+	else:
+		high = mid - 1
+```
+- We are making the high pointer point to just before the kth element which is present in the array
+- As now we have high pointer, we can the answer by, `arr[high] + some_extra`
+- `some_extra = k - {arr[high] - (high+1)}` this is basically `k - elements missing at high index`
+- So finally get answer = (~~arr[high]~~ + k - ~~arr[high]~~ + high + 1)
+- ans is `k + high + 1`
+- When the loop ends `low` will one greater than `high` so `low` will be `high + 1`
+- ans is `k + low`
+
+```python
+def findKthPositive(arr: [int], k: int) -> int:
+	high = len(arr) - 1
+	low = 0
+	while low <= high:
+		mid = (high + low) >> 1
+		cur_miss_num = arr[mid] - mid - 1
+		if cur_miss_num < k:
+			low = mid + 1
+		else:
+			high = mid - 1
+	return low + k
 ```
