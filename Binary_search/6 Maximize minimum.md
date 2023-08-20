@@ -70,3 +70,56 @@ Basically polarities have been switched,
 
 <hr>
 
+
+**2Q)** Given an array `arr` of integer numbers, `ar[i]` represents the number of pages in the `i-th` book. There are a ‘m’ number of students, and the task is to allocate all the books to the students.  
+Allocate books in such a way that:
+
+1. Each student gets at least one book.
+2. Each book should be allocated to only one student.
+3. Book allocation should be in a contiguous manner.
+
+You have to allocate the book to ‘m’ students such that the maximum number of pages assigned to a student is minimum. If the allocation of books is not possible. return -1
+
+**Book allocation / Painters Partitions / Split Array**
+
+```python
+class Solution:
+    def helper_fun(self, nums: [int], tryNumber: int):
+        students_over = 1  # Initialize the count of students exceeding the tryNumber
+        pages_comp = 0      # Initialize the cumulative pages read by a student
+
+        # Iterate through each book's pages in nums
+        for i in nums:
+            if pages_comp + i <= tryNumber:
+                pages_comp += i  # If current book can be added to current student's reading, add it
+            else:
+                students_over += 1  # If adding the current book exceeds the tryNumber, increment student count
+                pages_comp = i       # Reset cumulative pages for a new student
+        return students_over     # Return the total number of students needed
+
+    def splitArray(self, nums: [int], k: int) -> int:
+        low = max(nums)  # Initialize lower bound for binary search as the maximum pages in a book
+        high = 0         # Initialize upper bound for binary search as the sum of all pages in nums
+        
+        # Calculate the sum of all pages in nums to set the initial upper bound
+        for i in nums:
+            high += i
+        
+        # Binary search loop
+        while low <= high:
+            mid = (high + low) >> 1  # Calculate the midpoint between low and high
+            
+            # Call the helper function to determine the number of students needed for mid pages
+            temp_ans = self.helper_fun(nums, mid)
+            
+            if temp_ans <= k:
+                high = mid - 1  # If the required students are less than or equal to k, adjust the upper bound
+            else:
+                low = mid + 1   # If the required students are more than k, adjust the lower bound
+        
+        return low  # Return the lowest possible tryNumber that satisfies the condition
+```
+
+<hr>
+
+**3Q)** 
