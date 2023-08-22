@@ -7,70 +7,52 @@ Return _the number of possible unique paths that the robot can take to reach the
 
 **Recurrence** solution
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-
-int actualAnswer(int row, int column, vector<vector<int>> &points, vector<vector<int>> &dp)
+int mazeObstaclesUtil(int i, int j, vector<vector<int>> &maze) 
 {
-    if(row == 0 && column == 0)
-        return points[0][0];
-    if(row < 0 || column < 0)
-        return 2e9;
-    int left = actualAnswer(row - 1, column, points, dp) + points[row][column];
-    int right = actualAnswer(row, column - 1, points, dp) + points[row][column];
-    return min(left, right);
+	if(i>0 && j>0 && maze[i][j]==-1) 
+		return 0; 
+	if(i==0 && j == 0)
+		return 1;
+	if(i<0 || j<0)
+		return 0;
+	
+	int up = mazeObstaclesUtil(i-1,j,maze,dp);
+	int left = mazeObstaclesUtil(i,j-1,maze,dp);
+	
+	return up+left;
 }
 
-class Solution
+int mazeObstacles(int n, int m, vector<vector<int> > &maze)
 {
-public:
-    int uniquePathsWithObstacles(vector<vector<int>> &obstacleGrid)
-    {
-        int m = obstacleGrid.size();
-        int n = obstacleGrid[0].size();
-        vector<vector<int>> dp(m + 1, vector<int>(n + 1, -1));
-        int ans = actualAnswer(m - 1, n - 1, obstacleGrid, dp);
-        return ans;
-    }
-};
+    return mazeObstaclesUtil(n-1,m-1,maze,dp);
+}
 ```
 
 
 
 **DP** solution
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-
-class Solution
+int mazeObstaclesUtil(int i, int j, vector<vector<int>> &maze, vector<vector<int>> 
+&dp) 
 {
-private:
-    int actualAnswer(int row, int column, vector<vector<int>> &points, vector<vector<int>> &dp)
-    {
-        if(row == 0 && column == 0)
-            return points[0][0];
-        if(row < 0 || column < 0)
-            return 2e9;
-        if (dp[row][column] != -1)
-            return dp[row][column];
-        int left = actualAnswer(row - 1, column, points, dp) + points[row][column];
-        int right = actualAnswer(row, column - 1, points, dp) + points[row][column];
-        dp[row][column] = min(left, right);
-        return dp[row][column];
+	if(i>0 && j>0 && maze[i][j]==-1) return 0; 
+	if(i==0 && j == 0)
+	return 1;
+	if(i<0 || j<0)
+	return 0;
+	if(dp[i][j]!=-1) return dp[i][j];
+	
+	int up = mazeObstaclesUtil(i-1,j,maze,dp);
+	int left = mazeObstaclesUtil(i,j-1,maze,dp);
+	
+	return dp[i][j] = up+left;
+  
 }
 
-public:
-    int minPathSum(vector<vector<int>> &obstacleGrid)
-    {
-        int m = obstacleGrid.size();
-        int n = obstacleGrid[0].size();
-        vector<vector<int>> dp(m + 1, vector<int>(n + 1, -1));
-        int ans = actualAnswer(m - 1, n - 1, obstacleGrid, dp);
-        return ans;
-    }
-};
+int mazeObstacles(int n, int m, vector<vector<int> > &maze)
+{
+    vector<vector<int> > dp(n,vector<int>(m,-1));
+    return mazeObstaclesUtil(n-1,m-1,maze,dp);
+    
+}
 ```
-
-
-
-**Tabulation** solution
