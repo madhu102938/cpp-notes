@@ -1,0 +1,433 @@
+**1Q)** You are given a weighted undirected graph having **v** vertices numbered from 1 to v and **e** edges describing there are edges between a to b with some weight, find the shortest path between the vertex 1 and the vertex v and if path does not exist then return a list consisting of only -1.
+
+```cpp
+vector<int> shortestPath(int v, int e, vector<vector<int>>& edge) {
+    // Create an adjacency list to represent the graph
+    vector<pair<int, int>> adj[v+1];
+    
+    // Populate the adjacency list with edges and their weights
+    for (int i = 0; i < e; i++) {
+        adj[edge[i][0]].push_back({edge[i][1], edge[i][2]});
+        adj[edge[i][1]].push_back({edge[i][0], edge[i][2]});
+    }
+
+    // Initialize distances to a high value and set for tracking nodes and distances
+    vector<int> dist(v+1, 1e9);
+    set<pair<int, int>> s;
+    
+    // Insert the source node (node 1) with distance 0 into the set
+    s.insert({0, 1});
+    dist[1] = 0;
+    
+    // Initialize memoization array for tracking the shortest path
+    vector<int> memoization(v+1, 0);
+
+    // Dijkstra's algorithm
+    while (!s.empty()) {
+        auto now = *(s.begin());
+        int dis = now.first;
+        int curr = now.second;
+        s.erase(now);
+
+        // Explore neighbors of the current node
+        for (auto it : adj[curr]) {
+            if (it.second + dis < dist[it.first]) {
+                // Update set with the new distance and node if shorter path is found
+                if (dist[it.first] != 1e9)
+                    s.erase({dist[it.first], it.first});
+                s.insert({it.second + dis, it.first});
+                dist[it.first] = it.second + dis;
+                memoization[it.first] = curr;
+            }
+        }
+    }
+    
+    // If destination node is unreachable, return {-1}
+    if (dist[v] == 1e9)
+        return {-1};
+    
+    // Trace back the shortest path using memoization array
+    vector<int> ans;
+    int i = v;
+    while (i != 1) {
+        ans.push_back(i);
+        i = memoization[i];
+    }
+    ans.push_back(1);
+    reverse(ans.begin(), ans.end());
+
+    return ans;
+}
+```
+
+<hr>
+
+**2Q)** Given an `n x n` binary matrix `grid`, return _the length of the shortest **clear path** in the matrix_. If there is no clear path, return `-1`.
+
+A **clear path** in a binary matrix is a path from the **top-left** cell (i.e., `(0, 0)`) to the **bottom-right** cell (i.e., `(n - 1, n - 1)`) such that:
+
+- All the visited cells of the path are `0`.
+- All the adjacent cells of the path are **8-directionally** connected (i.e., they are different and they share an edge or a corner).
+
+The **length of a clear path** is the number of visited cells of this path.
+
+for this questions we can just use plan old BFS and we get the right
+
+**Dijkstra's algorithm**
+```cpp
+int shortestPathBinaryMatrix(vector<vector<int>>& grid) {
+    // If starting cell is blocked, return -1
+    if (grid[0][0] == 1)
+        return -1;
+    
+    int n = grid.size();
+    
+    // Initialize a matrix to store distances
+    vector<vector<int>> dis(n, vector<int>(n, 1e9));
+    dis[0][0] = 1;
+    
+    // Initialize a queue for BFS traversal
+    queue<vector<int>> q;
+    q.push({1, 0, 0});  // Distance, current row, current column
+
+    while (!q.empty()) {
+        int currx = q.front()[1];
+        int curry = q.front()[2];
+        int d = q.front()[0];
+        
+        // If reached the bottom-right cell, return the distance
+        if (currx == n-1 && curry == n-1)
+            return d;
+
+        q.pop();
+
+        // Explore neighboring cells
+        for (int row = -1; row <= 1; row++) {
+            for (int col = -1; col <= 1; col++) {
+                if (row == 0 && col == 0)
+                    continue;
+                int nrow = currx + row, ncol = curry + col;
+                
+                // Check validity of the new cell and if it's clear
+                if (nrow >= 0 && nrow < n && ncol >= 0 && ncol < n &&
+                    grid[nrow][ncol] == 0) {
+                    if (1 + d < dis[nrow][ncol]) {
+                        dis[nrow][ncol] = 1 + d;
+                        q.push({1 + d, nrow, ncol});
+                    }
+                }
+            }
+        }
+    }
+
+    // If no clear path found to the bottom-right cell, return -1
+	return -1;
+}
+```
+
+
+**Regular BFS**
+```cpp
+int shortestPathBinaryMatrix(vector<vector<int>>& grid) {
+    // If starting cell is blocked, return -1
+    if (grid[0][0] == 1)
+        return -1;
+    
+    int n = grid.size();
+    
+    // Initialize a matrix to keep track of visited cells
+    vector<vector<int>> vis(n, vector<int>(n, 0));
+    vis[0][0] = 1;
+    
+    // Initialize a queue for BFS traversal
+    queue<vector<int>> q;
+    q.push({1, 0, 0});  // Distance, current row, current column
+
+    while (!q.empty()) {
+        int currx = q.front()[1];
+        int curry = q.front()[2];
+        int d = q.front()[0];
+        
+        // If reached the bottom-right cell, return the distance
+        if (currx == n-1 && curry == n-1)
+            return d;
+
+        q.pop();
+
+        // Explore neighboring cells
+        for (int row = -1; row <= 1; row++) {
+            for (int col = -1; col <= 1; col++) {
+                if (row == 0 && col == 0)
+                    continue;
+                int nrow = currx + row, ncol = curry + col;
+                
+                // Check validity of the new cell and if it's clear and not visited
+                if (nrow >= 0 && nrow < n && ncol >= 0 && ncol < n &&
+                    grid[nrow][ncol] == 0 && !vis[nrow][ncol]) {
+                    vis[nrow][ncol] = 1;
+                    q.push({1 + d, nrow, ncol});
+                }
+            }
+        }
+    }
+
+    // If no clear path found to the bottom-right cell, return -1
+    return -1;
+}
+
+```
+
+<hr>
+
+**3Q)** You are a hiker preparing for an upcoming hike. You are given `heights`, a 2D array of size `rows x columns`, where `heights[row][col]` represents the height of cell `(row, col)`. You are situated in the top-left cell, `(0, 0)`, and you hope to travel to the bottom-right cell, `(rows-1, columns-1)` (i.e., **0-indexed**). You can move **up**, **down**, **left**, or **right**, and you wish to find a route that requires the minimum **effort**.
+
+A route's **effort** is the **maximum absolute difference** in heights between two consecutive cells of the route.
+
+Return _the minimum **effort** required to travel from the top-left cell to the bottom-right cell._
+
+```cpp
+int MinimumEffort(vector<vector<int>> &heights)
+{
+
+	// Create a priority queue containing pairs of cells 
+	// and their respective distance from the source cell in the 
+	// form {diff, {row of cell, col of cell}}.
+	priority_queue<pair<int, pair<int, int>>,
+				   vector<pair<int, pair<int, int>>>,
+				   greater<pair<int, pair<int, int>>>>
+		pq;
+
+	int n = heights.size();
+	int m = heights[0].size();
+
+	// Create a distance matrix with initially all the cells marked as
+	// unvisited and the dist for source cell (0,0) as 0.
+	vector<vector<int>> dist(n, vector<int>(m, 1e9));
+	dist[0][0] = 0;
+	pq.push({0, {0, 0}});
+
+	// The following delta rows and delts columns array are created such that
+	// each index represents each adjacent node that a cell may have 
+	// in a direction.
+	int dr[] = {-1, 0, 1, 0};
+	int dc[] = {0, 1, 0, -1};
+
+	// Iterate through the matrix by popping the elements out of the queue
+	// and pushing whenever a shorter distance to a cell is found.
+	while (!pq.empty())
+	{
+		auto it = pq.top();
+		pq.pop();
+		int diff = it.first;
+		int row = it.second.first;
+		int col = it.second.second;
+
+		// Check if we have reached the destination cell,
+		// return the current value of difference (which will be min).
+		if (row == n - 1 && col == m - 1)
+			return diff;
+	   
+		for (int i = 0; i < 4; i++)
+		{
+			// row - 1, col
+			// row, col + 1
+			// row - 1, col
+			// row, col - 1
+			int newr = row + dr[i];
+			int newc = col + dc[i];
+
+			// Checking validity of the cell.
+			if (newr >= 0 && newc >= 0 && newr < n && newc < m)
+			{
+				// Effort can be calculated as the max value of differences 
+				// between the heights of the node and its adjacent nodes.
+				int newEffort = max(abs(heights[row][col] - heights[newr][newc]), diff);
+
+				// If the calculated effort is less than the prev value
+				// we update as we need the min effort.
+				if (newEffort < dist[newr][newc])
+				{
+					dist[newr][newc] = newEffort;
+					pq.push({newEffort, {newr, newc}});
+				}
+			}
+		}
+	}
+	return 0; // if unreachable
+}
+```
+
+<hr>
+
+### Minimum multiplications to reach end
+**4Q)** Given **start**, **end** and an array **arr** of **n** numbers. At each step, **start** is multiplied with any number in the array and then mod operation with **100000** is done to get the new start.
+
+Your task is to find the minimum steps in which **end** can be achieved starting from **start**. If it is not possible to reach **end**, then return **-1**.
+
+```cpp
+#include <bits/stdc++.h>
+#define ll long long
+
+// Function to find the minimum number of operations to reach 'end' from 'start'
+int minimumOperations(int n, int start, int end, vector<int> &arr) {
+    int mod = 1e5;
+    // Create a distance array to store the minimum distance from 'start' to each possible value
+    vector<int> distance(mod, 1e9);
+
+    // Create a queue for Dijkstra's algorithm
+    queue<vector<int>> q;
+    q.push({0, start});
+    distance[start] = 0;
+
+    // Perform BFS
+    while (!q.empty()) {
+        vector<int> vec = q.front();
+        int curr = vec[1];
+        int dis = vec[0];
+        q.pop();
+
+        // If the target 'end' value is reached, return the distance
+        if (curr == end)
+            return dis;
+
+        // Calculate adjacent values by multiplying current value with each element in 'arr'
+        // creating adjacency list on the fly
+        vector<int> adj(n);
+        for (int i = 0; i < n; i++) {
+            adj[i] = ((ll)curr * (ll)arr[i]) % mod;
+        }
+
+        // Update distance and enqueue adjacent values if a shorter path is found
+        for (int it : adj) {
+            if (dis + 1 < distance[it]) {
+                distance[it] = dis + 1;
+                q.push({dis + 1, it});
+            }
+        }
+    }
+
+    // If 'end' cannot be reached, return -1
+    return -1;
+}
+
+```
+
+<hr>
+
+### Cheapest flight within K stops
+**5Q)** There are `n` cities and m edges connected by some number of flights. You are given an array `flights` where `flights[i] = [fromi, toi, pricei]` indicates that there is a flight from the city `fromi` to city `toi` with cost `pricei`.
+
+You are also given three integers `src`, `dst`, and `k`, return _**the cheapest price** from_ `src` _to_ `dst` _with at most_ `k` _stops._ If there is no such route, return `-1`.
+
+```cpp
+#include <bits/stdc++.h>
+
+// Function to find the cheapest flight cost from src to dst with at most K stops
+int CheapestFLight(int n, vector<vector<int>>& flights, int src, int dst, int K) {
+    // Create an adjacency list to represent flights between cities
+    vector<pair<int, int>> adj[n];
+    // Create a distance array to store the minimum cost from src to each city
+    vector<int> distance(n, 1e9);
+
+    // Build the adjacency list
+    for (auto it : flights)
+        adj[it[0]].push_back({it[1], it[2]});
+
+    // Create a queue for BFS traversal
+    queue<vector<int>> q;
+    q.push({0, src, 0}); // Format: {order, city, distance}
+    distance[src] = 0;
+
+    // Applying Dijkstra's Algorithm for at most K stops
+    while (!q.empty()) {
+        int curr = q.front()[1];   // Current city
+        int order = q.front()[0];  // Number of stops taken
+        int dis = q.front()[2];     // Distance traveled
+        q.pop();
+
+        if (order > K)
+            continue;  // Skip if more than K stops have been taken
+
+        // Traverse neighbors of the current city
+        for (auto it : adj[curr]) {
+            if (order <= K) {
+                // If the current distance + flight cost is less than the stored distance to the city
+                if (dis + it.second < distance[it.first]) {
+                    distance[it.first] = dis + it.second;
+                    q.push({order + 1, it.first, distance[it.first]});
+                }
+            }
+        }
+    }
+
+    // If the distance to the destination is still the initial value, no route was found
+    if (distance[dst] == 1e9)
+        return -1;
+
+    // Return the minimum cost to reach the destination
+    return distance[dst];
+}
+
+```
+
+<hr>
+
+### Number of ways to arrive at destination
+
+**6Q)** You are in a city that consists of `n` intersections numbered from `0` to `n - 1` with **bi-directional** roads between some intersections. The inputs are generated such that you can reach any intersection from any other intersection and that there is at most one road between any two intersections.
+
+You are given an integer `n` and a 2D integer array `roads` where `roads[i] = [ui, vi, timei]` means that there is a road between intersections `ui` and `vi` that takes `timei` minutes to travel. You want to know in how many ways you can travel from intersection `0` to intersection `n - 1` in the **shortest amount of time**.
+
+Return _the **number of ways** you can arrive at your destination in the **shortest amount of time**_. Since the answer may be large, return it **modulo** `109 + 7`.
+
+```cpp
+#include <bits/stdc++.h>
+
+int countPaths(int n, vector<vector<int>>& roads) {
+    // Define the modulo value
+    long long int mod = (1e9 + 7);
+    
+    // Create an adjacency list to represent roads between intersections
+    vector<pair<int, long long int>> adj[n];
+    
+    // Build the adjacency list
+    for (auto it : roads) {
+        adj[it[0]].push_back({it[1], it[2]});
+        adj[it[1]].push_back({it[0], it[2]});
+    }
+
+    // Create distance and total_ways arrays
+    vector<long long int> distance(n, LONG_MAX), total_ways(n, 0);
+
+    // Create a priority queue for Dijkstra's algorithm
+    priority_queue<pair<long long int, int>, vector<pair<long long int, int>>, greater<pair<long long int, int>>> pq;
+    pq.push({0, 0});
+    distance[0] = 0;
+    total_ways[0] = 1;
+
+    // Perform Dijkstra's algorithm
+    while (!pq.empty()) {
+        long long int dis = pq.top().first;
+        int curr = pq.top().second;
+        pq.pop();
+
+        // Traverse neighbors of the current intersection
+        for (auto it : adj[curr]) {
+            if (dis + it.second < distance[it.first]) {
+                distance[it.first] = dis + it.second;
+                pq.push({dis + it.second, it.first});
+                total_ways[it.first] = total_ways[curr];
+            } else if ((dis + it.second) == distance[it.first]) {
+                total_ways[it.first] = (total_ways[it.first] + total_ways[curr]) % mod;
+            }
+        }
+    }
+
+    // If distance to the destination is still the initial value, return 0 ways
+    if (distance[n - 1] == LONG_MAX)
+        return 0;
+
+    // Return the total ways modulo mod
+    return total_ways[n - 1] % mod;
+}
+```
