@@ -59,3 +59,167 @@ public:
     }
 };
 ```
+
+
+```java
+public static int maximumLearning(List<Integer> iv, List<Integer> articles, int p){
+        int n=iv.size();    //finding the size of the list
+        int associated[][]=new int[n][2];    //creating a 2-d associated array with dimension n and 2
+        for(int i=0;i<n;i++){    //creating the associated array
+            associated[i][0]=articles.get(i)*2;
+            associated[i][1]=iv.get(i);
+        }
+        int max_learning=-1,pages=0,learning=0;
+        for(int i=0;i<n;i++){    //generating all possible sub-arrays of the associated array
+            for(int k=0;k<n-i;k++){
+                learning=0;
+                pages=0;
+                for(int j=i;j<=k;j++){
+                    pages+=associated[j][0];    //adding the pages
+                    if(pages>p){    //if pages exceed break the loop
+                        break;
+                    }
+                    learning+=associated[j][1];    //adding the iv value
+                }
+                if(learning>max_learning){    //current learning greater than max_learning
+                    max_learning=learning;    //set max_learning to current_learning
+                }
+            }
+        }
+        return max_learning;    //return the max_learning
+
+    }    
+}
+```
+
+
+```cpp
+int maximumLearning(vector<int> iv, vector<int> articles, int p){
+    int n = iv.size();    //finding the size of the list
+    int associated[n][2];    //creating a 2-d associated array with dimension n and 2
+    for(int i=0;i<n;i++){    //creating the associated array
+        associated[i][0]=articles.at(i)*2;
+        associated[i][1]=iv.at(i);
+    }
+    int max_learning=-1,pages=0,learning=0;
+    for(int i=0;i<n;i++){    //generating all possible sub-arrays of the associated array
+        for(int k=0;k<n-i;k++){
+            learning=0;
+            pages=0;
+            for(int j=i;j<=k;j++){
+                pages+=associated[j][0];    //adding the pages
+                if(pages>p){    //if pages exceed break the loop
+                    break;
+                }
+                learning+=associated[j][1];    //adding the iv value
+            }
+            if(learning>max_learning){    //current learning greater than max_learning
+                max_learning=learning;    //set max_learning to current_learning
+            }
+        }
+    }
+    return max_learning;    //return the max_learning
+}
+```
+
+
+```java
+static int getMaximumJobs (int n, int m, int k) {
+        k--;                                // Change k to zero based index instead of one based index 
+        int arr [] = new int [n];
+        for (int i = 0; i < n; i++) arr [i] = 1; // Fill the array with 1's first 
+        int sum = n, maxjob = 1;                 // With all 1's, the sum is n and maxjob is 1 
+        
+        while (sum <= m) {
+            // Increase the kth item by 1; this increased value is now maxjob 
+            arr [k]++;
+            maxjob = arr [k];
+            // Make sure difference between elements (on left of kth element) is 1 or less (for balanced schedule)
+            // If the difference is more than 1, increase element so that difference is 1 
+            for (int i = k - 1; i >= 0; i--) 
+                if ((arr [i + 1] - arr [i]) > 1) arr [i]++;
+            // Do same thing for elements to the right of kth element 
+            for (int i = k + 1; i < n; i++) 
+                if ((arr [i - 1] - arr [i]) > 1) arr [i]++;
+            
+            // Find the new sum of all elements again 
+            sum = 0;
+            for (int i = 0; i < n; i++) sum += arr [i];
+        }
+        // When we reach here, the sum of the elements is > m, so maxjob is one value too high 
+        // decrement maxjob and return it 
+        return maxjob - 1;
+    }
+```
+
+
+```cpp
+int getMaximumJobs (int n, int m, int k) {
+        k--;                                // Change k to zero based index instead of one based index 
+        int arr [n];
+        for (int i = 0; i < n; i++) arr [i] = 1; // Fill the array with 1's first 
+        int sum = n, maxjob = 1;                 // With all 1's, the sum is n and maxjob is 1 
+        
+        while (sum <= m) {
+            // Increase the kth item by 1; this increased value is now maxjob 
+            arr [k]++;
+            maxjob = arr [k];
+            // Make sure difference between elements (on left of kth element) is 1 or less (for balanced schedule)
+            // If the difference is more than 1, increase element so that difference is 1 
+            for (int i = k - 1; i >= 0; i--) 
+                if ((arr [i + 1] - arr [i]) > 1) arr [i]++;
+            // Do same thing for elements to the right of kth element 
+            for (int i = k + 1; i < n; i++) 
+                if ((arr [i - 1] - arr [i]) > 1) arr [i]++;
+            
+            // Find the new sum of all elements again 
+            sum = 0;
+            for (int i = 0; i < n; i++) sum += arr [i];
+        }
+        // When we reach here, the sum of the elements is > m, so maxjob is one value too high 
+        // decrement maxjob and return it 
+        return maxjob - 1;
+    }
+```
+
+
+```cpp
+int maximumLearning(vector<int>& iv,vector<int> &articles,int p) {
+    int total = articles.size();
+    vector<vector<int>> dp(total + 1, vector<int>(p + 1, 0));
+
+    for (int i = 1; i <= total; ++i) {
+        for (int pages = 0; pages <= p; ++pages) {
+            dp[i][pages] = dp[i - 1][pages];
+
+            if (pages >= articles[i - 1]) {
+                dp[i][pages] = max(dp[i][pages], dp[i - 1][pages - iv[i-1]] + 2 * iv[i - 1] * iv[i - 1]);
+            }
+        }
+    }
+
+    return dp[total][p];
+}
+```
+
+
+
+```cpp
+int ok(vector<vector<int>> &f,vector<int> &iv,vector<int> &articles,int p,int i=0)
+{
+    if(i == iv.size()) return 0;
+    if(f[i][p] != -1) return f[i][p];
+    int a1=ok(f,iv,articles,p,i+1);
+    int a2=0;
+    if(2*articles[i] <= p)
+    a2=iv[i] + ok(f,iv,articles,p-2*articles[i],i+1);
+    f[i][p] = max(a1,a2);
+    return f[i][p];
+}
+int maximumLearning(vector<int> iv,vector<int> articles,int p)
+{
+    int n=articles.size();
+    vector<vector<int>> f(n+1,vector<int>(p+1,-1));
+    return ok(f,iv,articles,p);
+}
+```

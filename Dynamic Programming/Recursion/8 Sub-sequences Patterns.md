@@ -85,7 +85,8 @@ public:
         // Base case: if the target sum is 0, the current combination is valid
         if (target == 0)
         {
-            // Add it to the answer vector
+            // Sort the current combination and add it to the answer vector
+            sort(ds.begin(), ds.end());
             ans.push_back(ds);
             return;
         }

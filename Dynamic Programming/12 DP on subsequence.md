@@ -76,8 +76,6 @@ bool subsetSumToK(int n, int k, vector<int> &arr)
   {
     for (int target = 1; target <= k; target++)
     {
-      if (target == arr[0])
-        dp[index][target] = 1;
       else
       {
         int take = 0, dontTake = 0;
