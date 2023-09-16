@@ -189,3 +189,38 @@ int frogJump(int n, vector<int> &heights)
     return ans;
 }
 ```
+
+<hr>
+### Frog jumps to 1, 2, ,3...
+There is an array of heights corresponding to `n` stones. You have to reach from stone 1 to stone `n`. From stone, it is possible to reach stones 'i'+1, ‘i’+2… ‘i’+`k` , and the cost incurred will be | Height[i]-Height[j] |, where `j` is the landing stone.
+
+*Return* the minimum possible total cost incurred in reaching the stone `n`.
+
+**DP** solution
+```cpp
+int actualAnswer(int index, int k, vector<int> &heights, vector<int> &dp)
+{
+    if (index == 0)
+        return 0;
+    
+    if (dp[index] != -1)
+        return dp[index];
+        
+    int ans = 0;
+    int mini = INT_MAX;
+    for (int i = index-1; i >= index - k; i--)
+    {
+        if (i >= 0) 
+        {
+          ans = actualAnswer(i, k, heights, dp) + abs(heights[index] - heights[i]);
+          mini = min(ans, mini);
+        }
+    }
+    return dp[index] = mini;
+}
+
+int minimizeCost(int n, int k, vector<int> &heights){
+    vector<int> dp(n+1, -1);
+    return actualAnswer(n-1, k, heights, dp);
+}
+```
