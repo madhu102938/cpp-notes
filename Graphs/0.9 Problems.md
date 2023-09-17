@@ -1,0 +1,294 @@
+**1Q)** Given an `m x n` binary matrix `mat`, return _the distance of the nearest_ `0` _for each cell_.
+
+The distance between two adjacent cells is `1`.
+
+```cpp
+void actualAnswer(vector<vector<int>> &mat, vector<vector<int>> &vis, vector<vector<int>> &ans, int m, int n)
+{
+    // Create a queue to perform breadth-first search
+    queue<pair<pair<int, int>, int>> q;
+
+    // Initialize the queue with the positions of cells containing 0, and their distance as 0
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (mat[i][j] == 0)
+                q.push({{i, j}, 0});
+        }
+    }
+
+    // Perform breadth-first search
+    while (!q.empty())
+    {
+        // Extract current cell's row, column, and distance from the front of the queue
+        int crow = q.front().first.first;
+        int ccol = q.front().first.second;
+        int dis = q.front().second;
+        q.pop();
+
+        // Store the distance to the nearest 0 in the 'ans' matrix
+        ans[crow][ccol] = dis;
+
+        // Define possible movements to adjacent cells (up, down, left, right)
+        int delrow[] = {-1, 0, 0, 1};
+        int delcol[] = {0, -1, 1, 0};
+
+        // Explore neighboring cells
+        for (int i = 0; i < 4; i++)
+        {
+            int nrow = crow + delrow[i];
+            int ncol = ccol + delcol[i];
+
+            // Check if the neighboring cell is within matrix bounds and not visited
+            // Also, ensure the neighboring cell is not already assigned a distance (not a 0)
+            if (nrow >= 0 && nrow < m && ncol >= 0 
+            && ncol < n && !vis[nrow][ncol] && mat[nrow][ncol] != 0)
+            {
+                // Mark the neighboring cell as visited
+                vis[nrow][ncol] = 1;
+
+                // Push the neighboring cell's position and distance to the queue
+                q.push({{nrow, ncol}, dis+1});
+            }
+        }
+    }
+}
+
+// Function to calculate the distance of the nearest 0 for each cell in the matrix
+vector<vector<int>> updateMatrix(vector<vector<int>>& mat) 
+{
+    int m = mat.size();
+    int n = mat[0].size();
+    // Create matrices to keep track of visited cells and store the distances
+    vector<vector<int>> vis(m, vector<int>(n, 0)), ans(m, vector<int>(n, 0));
+    // Call the actualAnswer function to perform the breadth-first search
+    actualAnswer(mat, vis, ans, m, n);
+    // Return the matrix with updated distances
+    return ans;
+}
+
+```
+
+<hr>
+
+**2Q)** Given an `m x n` matrix `board` containing `'X'` and `'O'`, _capture all regions that are 4-directionally surrounded by_ `'X'`.
+
+A region is **captured** by flipping all `'O'`s into `'X'`s in that surrounded region.
+
+```cpp
+// This function is a helper function that performs a depth-first search to mark all connected 'O's as visited.
+void actualAnswer(vector<vector<char>> &board, vector<vector<int>> &vis, int i, int j, int m, int n)
+{
+    vis[i][j] = 1; // Mark the current cell as visited
+    
+    // Define possible movements to adjacent cells (up, down, left, right)
+    int delrow[] = {-1, 0, 0, 1};
+    int delcol[] = {0, -1, 1, 0};
+
+    // Explore neighboring cells
+    for (int k = 0; k < 4; k++)
+    {
+        int nrow = i + delrow[k], ncol = j + delcol[k];
+        // Check if the neighboring cell is within matrix bounds, not visited, and contains 'O'
+        if (nrow >= 0 && nrow < m && ncol >= 0 && ncol < n && !vis[nrow][ncol] && board[nrow][ncol] != 'X')
+        {
+            // Recursively call the function for the neighboring cell
+            actualAnswer(board, vis, nrow, ncol, m, n);
+        }
+    }
+}
+
+// Main function to solve the problem
+void solve(vector<vector<char>> &board)
+{
+    int m = board.size();
+    int n = board[0].size();
+    vector<vector<int>> vis(m, vector<int>(n, 0)); // Matrix to keep track of visited cells
+    
+    // Traverse the first and last columns of the matrix
+    for (int i = 0; i < m; i++)
+    {
+        if (board[i][0] == 'O' && !vis[i][0])
+            actualAnswer(board, vis, i, 0, m, n);
+        if (board[i][n - 1] == 'O' && !vis[i][n-1])
+            actualAnswer(board, vis, i, n - 1, m, n);
+    }
+
+    // Traverse the first and last rows of the matrix
+    for (int j = 1; j < n-1; j++)
+    {
+        if (board[0][j] == 'O' && !vis[0][j])
+            actualAnswer(board, vis, 0, j, m, n);
+        if (board[m - 1][j] == 'O' && !vis[m-1][j])
+            actualAnswer(board, vis, m - 1, j, m, n);
+    }
+
+    // Convert unvisited 'O's to 'X' since they are surrounded by 'X'
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (board[i][j] == 'O' && !vis[i][j])
+                board[i][j] = 'X';
+        }
+    }
+}
+```
+
+<hr>
+
+**3Q)** You are given an `m x n` binary matrix `grid`, where `0` represents a sea cell and `1` represents a land cell.
+
+A **move** consists of walking from one land cell to another adjacent (**4-directionally**) land cell or walking off the boundary of the `grid`.
+
+Return _the number of land cells in_ `grid` _for which we cannot walk off the boundary of the grid in any number of **moves**_.
+
+```cpp
+// This function performs a depth-first search to mark connected land cells as visited.
+void actualAnswer(vector<vector<int>> &board, vector<vector<int>> &vis, int i, int j, int m, int n)
+{
+    vis[i][j] = 1; // Mark the current cell as visited
+    queue<pair<int, int>> q;
+    q.push({i, j}); // Initialize a queue for BFS starting from this cell
+
+    while (!q.empty())
+    {
+        int crow = q.front().first;
+        int ccol = q.front().second;
+        q.pop();
+
+        // Define possible movements to adjacent cells (up, down, left, right)
+        int delrow[] = {-1, 0, 0, 1};
+        int delcol[] = {0, -1, 1, 0};
+
+        // Explore neighboring cells
+        for (int k = 0; k < 4; k++)
+        {
+            int nrow = crow + delrow[k], ncol = ccol + delcol[k];
+            // Check if the neighboring cell is within matrix bounds, not visited, and is land
+            if (nrow >= 0 && nrow < m && ncol >= 0 && ncol < n && !vis[nrow][ncol] && board[nrow][ncol] != 0)
+            {
+                // Mark the neighboring cell as visited and push it to the queue for BFS
+                vis[nrow][ncol] = 1;
+                q.push({nrow, ncol});
+            }
+        }
+    }
+}
+
+// Main function to count the number of land cells that are not reachable from the boundary
+int numEnclaves(vector<vector<int>>& grid) 
+{
+    int m = grid.size();
+    int n = grid[0].size();
+    vector<vector<int>> vis(m, vector<int>(n, 0)); // Matrix to keep track of visited cells
+    
+    // Traverse the first and last columns of the matrix
+    for (int i = 0; i < m; i++)
+    {
+        if (grid[i][0] == 1 && !vis[i][0])
+            actualAnswer(grid, vis, i, 0, m, n);
+        if (grid[i][n - 1] == 1 && !vis[i][n-1])
+            actualAnswer(grid, vis, i, n - 1, m, n);
+    }
+
+    // Traverse the first and last rows of the matrix
+    for (int j = 1; j < n-1; j++)
+    {
+        if (grid[0][j] == 1 && !vis[0][j])
+            actualAnswer(grid, vis, 0, j, m, n);
+        if (grid[m - 1][j] == 1 && !vis[m-1][j])
+            actualAnswer(grid, vis, m - 1, j, m, n);
+    }
+
+    int ans = 0;
+    // Count the remaining unvisited land cells
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (grid[i][j] == 1 && !vis[i][j])
+                ans++;
+        }
+    }
+
+    return ans;
+}
+
+```
+
+<hr>
+
+**4Q)** Given a boolean 2D matrix **grid** of size **n** * **m**. You have to find the number of distinct islands where a group of connected 1s (horizontally or vertically) forms an island. Two islands are considered to be distinct if and only if one island is not equal to another (not rotated or reflected).
+
+```cpp
+// This function performs a breadth-first search to find connected 1s and identify a distinct island.
+bool actualAnswer(vector<vector<int>> &board, vector<vector<int>> &vis, set<vector<vector<int>>> &s, int i, int j, int m, int n)
+{
+    vis[i][j] = 1; // Mark the current cell as visited
+    queue<pair<int, int>> q;
+    q.push({i, j}); // Initialize a queue for BFS starting from this cell
+
+    int prev = s.size(); // Store the size of the set before processing this island
+    vector<vector<int>> v;
+    v.push_back({0, 0}); // Store the relative positions of connected 1s within this island
+    
+    while (!q.empty())
+    {
+        int crow = q.front().first;
+        int ccol = q.front().second;
+        q.pop();
+
+        // Define possible movements to adjacent cells (up, down, left, right)
+        int delrow[] = {-1, 0, 0, 1};
+        int delcol[] = {0, -1, 1, 0};
+
+        // Explore neighboring cells
+        for (int k = 0; k < 4; k++)
+        {
+            int nrow = crow + delrow[k], ncol = ccol + delcol[k];
+            // Check if the neighboring cell is within matrix bounds, not visited, and is a land cell (1)
+            if (nrow >= 0 && nrow < m && ncol >= 0 && ncol < n && !vis[nrow][ncol] && board[nrow][ncol] != 0)
+            {
+                // Mark the neighboring cell as visited and push it to the queue for BFS
+                vis[nrow][ncol] = 1;
+                q.push({nrow, ncol});
+                // Store the relative position of this connected 1 within the island
+                v.push_back({nrow - i, ncol - j});
+            }
+        }
+    }
+    
+    // Insert the set of relative positions of connected 1s into the set of islands
+    s.insert(v);
+
+    // Return true if the size of the set increased (new distinct island), else false
+    return s.size() != prev;
+}
+
+// Main function to count the number of distinct islands
+int countDistinctIslands(vector<vector<int>> &grid)
+{
+    int m = grid.size(), n = grid[0].size();
+    vector<vector<int>> vis(m, vector<int>(n, 0)); // Matrix to keep track of visited cells
+    set<vector<vector<int>>> s; // Set to store distinct islands
+    int ans = 0;
+
+    // Iterate through each cell in the grid
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (grid[i][j] == 1 && !vis[i][j])
+            {
+                // If the function returns true, increment the answer
+                if (actualAnswer(grid, vis, s, i, j, m, n))
+                    ans++;
+            }
+        }
+    }
+    return ans; // Return the total count of distinct islands
+}
+
+```
