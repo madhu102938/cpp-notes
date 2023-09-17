@@ -1,0 +1,71 @@
+Consider a rat placed at `(0, 0)` in a square matrix of order `N * N`. It has to reach the destination at `(N - 1, N - 1)`. Find all possible paths that the rat can take to reach from source to destination. The directions in which the rat can move are **'U'(up), 'D'(down), 'L' (left), 'R' (right)**. Value **0** at a cell in the matrix represents that it is **blocked** and rat cannot move to it while value **1** at a cell in the matrix represents that rat **can be travel through it**.
+Note: In a path, **no** cell can be visited **more than one time**. If the source cell is 0, the rat cannot move to any other cell.
+
+```cpp
+class Solution{
+public:
+    // Function to recursively find paths in the maze
+    void actualAnswer(int row, int col, int final, vector<vector<int>> &maze, const string &ds, vector<vector<int>> &visit, vector<string> &ans)
+    {
+        // If we have reached the final destination, add the path to the answer list
+        if (row == final && col == final)
+        {
+            ans.push_back(ds);
+            return;
+        }
+
+        // Explore the possible moves: Down, Left, Right, Up
+
+        // Move Down
+        if (row < final && !visit[row + 1][col] && maze[row + 1][col])
+        {
+            visit[row][col] = 1;  // Mark the current cell as visited
+            actualAnswer(row + 1, col, final, maze, ds + "D", visit, ans);  // Recursive call
+            visit[row][col] = 0;  // Backtrack: Mark the current cell as unvisited
+        }
+
+        // Move Left
+        if (col > 0 && !visit[row][col - 1] && maze[row][col - 1])
+        {
+            visit[row][col] = 1;
+            actualAnswer(row, col - 1, final, maze, ds + "L", visit, ans);
+            visit[row][col] = 0;
+        }
+
+        // Move Right
+        if (col < final && !visit[row][col + 1] && maze[row][col + 1])
+        {
+            visit[row][col] = 1;
+            actualAnswer(row, col + 1, final, maze, ds + "R", visit, ans);
+            visit[row][col] = 0;
+        }
+
+        // Move Up
+        if (row > 0 && !visit[row - 1][col] && maze[row - 1][col])
+        {
+            visit[row][col] = 1;
+            actualAnswer(row - 1, col, final, maze, ds + "U", visit, ans);
+            visit[row][col] = 0;
+        }
+
+        return;
+    }
+
+    // Function to find paths in the maze
+    vector<string> findPath(vector<vector<int>> &m, int n) {
+        vector<vector<int>> visit(n, vector<int>(n, 0));  // Create a visit matrix to keep track of visited cells
+        string temp = "";  // Temporary string to store the current path
+        vector<string> ans;  // Vector to store the final answer paths
+        
+        // Check if the starting cell is blocked
+        if (m[0][0] == 0)
+            return ans;  // If blocked, return an empty answer vector
+        
+        // Call the recursive function to find paths from the starting cell (0,0) to the final cell (n-1,n-1)
+        actualAnswer(0, 0, n-1, m, temp, visit, ans);
+        
+        return ans;  // Return the list of valid paths found in the maze
+    }
+};
+
+```

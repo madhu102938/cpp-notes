@@ -1,0 +1,1 @@
+- Time complexity of a dp problem is the size of the <mark style="background: #FFB86CA6;">dp array times the number of operations being performed on every single element</mark>, as every single element in the dp is being calculated.

@@ -1,0 +1,3 @@
+- Count all ways
+- minimizing 
+- maximizing

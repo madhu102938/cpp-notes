@@ -1,0 +1,19 @@
+{
+	"nodes":[
+		{"id":"d3904aa8b6473471","type":"text","text":"`buy` variable","x":-220,"y":-620,"width":160,"height":50,"color":"3"},
+		{"id":"f717e0bfc7a277a9","type":"text","text":"`buy` == 1","x":-440,"y":-440,"width":140,"height":50,"color":"5"},
+		{"id":"36a5dc24dfa9a5a5","type":"text","text":"Not buying anything\n`0 + f(index+1, buy)`","x":-737,"y":-264,"width":250,"height":60,"color":"4"},
+		{"id":"07cb18c7ea44026c","type":"text","text":"Buying stock\n`-prices[index] + f(index+1, !buy)`","x":-392,"y":-264,"width":345,"height":60,"color":"4"},
+		{"id":"f01deb5b9d4a4d18","type":"text","text":"`buy` == 0","x":220,"y":-440,"width":149,"height":50,"color":"1"},
+		{"id":"1ba585d0a6691949","type":"text","text":"Selling (moving 2 places)\n`prices[index] + f(index+2, !buy)`","x":369,"y":-273,"width":346,"height":69,"color":"2"},
+		{"id":"3d8249e126d90d4c","type":"text","text":"Not Selling (move 1 place)\n`0 + f(index+1, buy)`","x":20,"y":-264,"width":250,"height":60,"color":"2"}
+	],
+	"edges":[
+		{"id":"8843fda6fb03fe14","fromNode":"d3904aa8b6473471","fromSide":"bottom","toNode":"f717e0bfc7a277a9","toSide":"top"},
+		{"id":"43f362bfa30cdc48","fromNode":"f717e0bfc7a277a9","fromSide":"bottom","toNode":"36a5dc24dfa9a5a5","toSide":"top"},
+		{"id":"253347cae92153ef","fromNode":"f717e0bfc7a277a9","fromSide":"bottom","toNode":"07cb18c7ea44026c","toSide":"top"},
+		{"id":"e0f14f30f8e3182e","fromNode":"d3904aa8b6473471","fromSide":"bottom","toNode":"f01deb5b9d4a4d18","toSide":"top"},
+		{"id":"f11ad163b131b3c3","fromNode":"f01deb5b9d4a4d18","fromSide":"bottom","toNode":"3d8249e126d90d4c","toSide":"top"},
+		{"id":"cefd7ef42b303c8f","fromNode":"f01deb5b9d4a4d18","fromSide":"bottom","toNode":"1ba585d0a6691949","toSide":"top"}
+	]
+}
