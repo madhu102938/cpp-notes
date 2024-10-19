@@ -1,0 +1,4 @@
+- CNN used for computer vision, lets take an image of `1000 * 1000` (lets consider black-and-white image for simplicity)
+- Here we have 1M pixels, that means 1M parameters, lets say we have first fully connected layer of 1000 neurons, then there would be `1M * 1000` weights
+- 1B weights are too many and it would take a long time to train the model this way, it also won't generalize well (overfit)
+- Thus to avoid this we use convolution operation

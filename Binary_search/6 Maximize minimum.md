@@ -1,3 +1,4 @@
+### Aggressive Cows
 **1Q)** You are given an array **‘arr’** of size **‘n’** which denotes the position of stalls.  
 You are also given an integer **‘k’** which denotes the number of aggressive cows.  
 
@@ -70,7 +71,7 @@ Basically polarities have been switched,
 
 <hr>
 
-
+### Allocate books / Painter Partitions / Split Array
 **2Q)** Given an array `arr` of integer numbers, `ar[i]` represents the number of pages in the `i-th` book. There are a ‘m’ number of students, and the task is to allocate all the books to the students.  
 Allocate books in such a way that:
 
